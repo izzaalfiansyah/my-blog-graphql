@@ -1,8 +1,9 @@
 import { YogaInitialContext } from "graphql-yoga";
 import { Context } from "../entity/context";
 import { User } from "../entity/user";
-import { compare } from "bcrypt";
-import { userData } from "../data/user";
+import jwt from "jsonwebtoken";
+import { PRIVATE_KEY } from "../resolver/auth-resolver";
+import { users } from "../data/user";
 
 export async function yogaContext({
   request: req,
@@ -14,14 +15,11 @@ export async function yogaContext({
       .get("authorization")
       ?.replace("Bearer ", "") as string;
 
-    const isValid = await compare(userData.email, token);
+    const { email }: any = jwt.verify(token, PRIVATE_KEY);
 
-    if (isValid) {
-      user = userData;
-    }
-    console.log(user);
+    user = users.find((user) => user.email == email)!;
   } catch (err) {
-    console.log("Unauthorized");
+    // console.log("Unauthorized");
   }
 
   return {

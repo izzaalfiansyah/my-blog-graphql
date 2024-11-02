@@ -23,6 +23,6 @@ export class Post {
   @Field(() => Date)
   createdAt: Date;
 
-  @Field(() => Date)
+  @Field(() => Date, { nullable: true })
   updatedAt: Date;
 }

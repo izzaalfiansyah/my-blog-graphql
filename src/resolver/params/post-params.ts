@@ -1,5 +1,5 @@
 import { MaxLength } from "class-validator";
-import { Field, InputType } from "type-graphql";
+import { ArgsType, Field, InputType } from "type-graphql";
 
 @InputType()
 export class PostInput {
@@ -18,4 +18,16 @@ export class PostInput {
 
   @Field(() => Boolean, { nullable: true })
   isPublished: boolean;
+}
+
+@ArgsType()
+export class PostsArgs {
+  @Field(() => Boolean, { nullable: true })
+  isPublished: boolean;
+
+  @Field(() => Number, { nullable: true })
+  limit: number;
+
+  @Field(() => Number, { nullable: true })
+  page: number;
 }

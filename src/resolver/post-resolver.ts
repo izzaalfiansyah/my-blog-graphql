@@ -107,7 +107,7 @@ export class PostResolver {
       throw res.error;
     }
 
-    this.deleteCachePost(id);
+    await this.deleteCachePost(id);
 
     return true;
   }
@@ -125,7 +125,7 @@ export class PostResolver {
       throw res.error;
     }
 
-    this.deleteCachePost(id);
+    await this.deleteCachePost(id);
 
     return true;
   }
@@ -143,7 +143,7 @@ export class PostResolver {
       throw res.error;
     }
 
-    this.deleteCachePost(id);
+    await this.deleteCachePost(id);
 
     return true;
   }
@@ -156,7 +156,7 @@ export class PostResolver {
       throw res.error;
     }
 
-    this.deleteCachePost(id);
+    await this.deleteCachePost(id);
 
     return true;
   }
@@ -168,12 +168,12 @@ export class PostResolver {
       const slug = (JSON.parse(cachePost).title as string)
         .replace(" ", "-")
         .toLowerCase();
-      redis.del(cache.post(id));
+      await redis.del(cache.post(id));
 
       const cachePostBySlug = await redis.get(cache.postBySlug(slug));
 
       if (!!cachePostBySlug) {
-        redis.del(cache.postBySlug(slug));
+        await redis.del(cache.postBySlug(slug));
       }
     }
   }

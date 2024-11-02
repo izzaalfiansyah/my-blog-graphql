@@ -34,6 +34,6 @@ export class AuthResolver {
   @Authorized()
   @Query(() => User)
   async profile(): Promise<User> {
-    return this.user;
+    return userData;
   }
 }

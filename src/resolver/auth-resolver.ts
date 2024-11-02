@@ -4,6 +4,7 @@ import { User } from "../entity/user";
 import { Context } from "../entity/context";
 import { users } from "../data/user";
 import jwt from "jsonwebtoken";
+import { compare } from "bcrypt";
 
 export const PRIVATE_KEY = "ITSASECRETFORMYBLOGAPPLICATION";
 
@@ -17,7 +18,9 @@ export class AuthResolver {
       throw new Error("email salah");
     }
 
-    if (input.password != user.password) {
+    const isPasswordValid = await compare(input.password, user.password);
+
+    if (!isPasswordValid) {
       throw new Error("password salah");
     }
 

@@ -18,6 +18,7 @@
     "typescript": "^5.6.3"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.46.1",
     "bcrypt": "^5.1.1",
     "class-validator": "^0.14.1",
     "cors": "^2.8.5",
@@ -27,7 +28,6 @@
     "graphql-yoga": "^5.8.0",
     "reflect-metadata": "^0.2.2",
     "sqlite3": "^5.1.7",
-    "type-graphql": "2.0.0-rc.2",
-    "typeorm": "^0.3.20"
+    "type-graphql": "2.0.0-rc.2"
   }
 }

@@ -6,7 +6,6 @@ import cors from "cors";
 import { createYoga } from "graphql-yoga";
 import { schema } from "./utils/graphql";
 import { yogaContext } from "./utils/yoga-context";
-import { DB } from "./utils/data-source";
 
 async function runApp() {
   const app = express();
@@ -16,8 +15,6 @@ async function runApp() {
     maskedErrors: false,
     context: yogaContext,
   });
-
-  await DB.initialize();
 
   app.use(cors());
 

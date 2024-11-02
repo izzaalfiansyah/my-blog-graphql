@@ -2,7 +2,6 @@ import { Field, ObjectType } from "type-graphql";
 
 @ObjectType()
 export class User {
-  @Field()
   password: string;
 
   @Field()
@@ -13,7 +12,4 @@ export class User {
 
   @Field()
   phone: string;
-
-  @Field()
-  about: string;
 }

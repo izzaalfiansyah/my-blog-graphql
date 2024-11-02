@@ -1,8 +1,9 @@
-import { Arg, Authorized, Mutation, Query, Resolver } from "type-graphql";
+import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { AuthInput } from "./params/auth-params";
 import { User } from "../entity/user";
 import { userData } from "../data/user";
 import { hash } from "bcrypt";
+import { Context } from "../entity/context";
 
 @Resolver()
 export class AuthResolver {
@@ -13,27 +14,23 @@ export class AuthResolver {
   }
 
   @Mutation(() => String, { nullable: true })
-  async login(@Arg("input") input: AuthInput): Promise<string | null> {
-    try {
-      if (input.email != this.user.email) {
-        throw new Error("email salah");
-      }
-
-      if (input.password != this.user.password) {
-        throw new Error("password salah");
-      }
-
-      const token = await hash(this.user.email, 10);
-
-      return token;
-    } catch (e) {
-      return null;
+  async login(@Arg("input") input: AuthInput): Promise<string> {
+    if (input.email != this.user.email) {
+      throw new Error("email salah");
     }
+
+    if (input.password != this.user.password) {
+      throw new Error("password salah");
+    }
+
+    const token = await hash(this.user.email, 10);
+
+    return token;
   }
 
   @Authorized()
   @Query(() => User)
-  async profile(): Promise<User> {
-    return userData;
+  async profile(@Ctx() ctx: Context): Promise<User> {
+    return ctx.user!;
   }
 }

@@ -20,7 +20,7 @@ async function runApp() {
   try {
     await redis.connect();
   } catch (err) {
-    //
+    // console.log(err);
   }
 
   app.use(cors());

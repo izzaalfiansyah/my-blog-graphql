@@ -6,6 +6,7 @@ import cors from "cors";
 import { createYoga } from "graphql-yoga";
 import { schema } from "./utils/graphql";
 import { yogaContext } from "./utils/yoga-context";
+import { redis } from "./utils/ioredis";
 
 async function runApp() {
   const app = express();
@@ -15,6 +16,12 @@ async function runApp() {
     maskedErrors: false,
     context: yogaContext,
   });
+
+  try {
+    await redis.connect();
+  } catch (err) {
+    //
+  }
 
   app.use(cors());
 

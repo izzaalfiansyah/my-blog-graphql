@@ -14,7 +14,10 @@ export class PostInput {
   tags: string[];
 
   @Field({ nullable: true })
-  coverImage?: string;
+  emoji?: string;
+
+  @Field({ nullable: true })
+  coverImageUrl?: string;
 
   @Field(() => Boolean, { nullable: true })
   isPublished: boolean;

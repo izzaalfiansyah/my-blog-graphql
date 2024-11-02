@@ -8,6 +8,9 @@ export class Post {
   @Field()
   title: string;
 
+  @Field({ nullable: true })
+  emoji: string;
+
   @Field()
   slug: string;
 
@@ -18,7 +21,7 @@ export class Post {
   tags?: string[];
 
   @Field({ nullable: true })
-  coverImage?: string;
+  coverImageUrl?: string;
 
   @Field(() => Boolean)
   isPublished: boolean;

@@ -9,6 +9,9 @@ export class Post {
   title: string;
 
   @Field()
+  slug: string;
+
+  @Field()
   content: string;
 
   @Field(() => [String], { nullable: true })

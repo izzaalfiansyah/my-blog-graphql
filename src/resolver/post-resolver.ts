@@ -1,4 +1,12 @@
-import { Arg, Args, Mutation, Query, Resolver } from "type-graphql";
+import {
+  Arg,
+  Args,
+  FieldResolver,
+  Mutation,
+  Query,
+  Resolver,
+  Root,
+} from "type-graphql";
 import { Post } from "../entity/post";
 import { PostInput, PostsArgs } from "./params/post-params";
 import { supabase } from "../utils/supabase";
@@ -176,5 +184,10 @@ export class PostResolver {
         await redis.del(cache.postBySlug(slug));
       }
     }
+  }
+
+  @FieldResolver(() => String)
+  slug(@Root() post: Post): string {
+    return post.title.replace(" ", "-");
   }
 }

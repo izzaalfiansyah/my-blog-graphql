@@ -17,7 +17,7 @@ import { redis } from "../utils/ioredis";
 export const postRepository = supabase.from("posts");
 
 const cache = {
-  post: (id: number) => PRIVATE_KEY + "-POST:" + id,
+  post: (id: any) => PRIVATE_KEY + "-POST:" + id,
   postBySlug: (slug: string) => PRIVATE_KEY + "-POSTBYSLUG:" + slug,
 };
 
@@ -51,14 +51,16 @@ export class PostResolver {
   }
 
   @Query(() => Post, { nullable: true })
-  async post(@Arg("id") id: number): Promise<Post | null> {
+  async post(@Arg("id") id: string): Promise<Post | null> {
     const cachePost = await redis.get(cache.post(id));
 
     if (cachePost) {
       return JSON.parse(cachePost);
     }
 
-    const { data: posts } = await postRepository.select("*").eq("id", id);
+    const { data: posts } = await postRepository
+      .select("*")
+      .eq("id", parseInt(id));
 
     const post = posts![0] || null;
 
@@ -104,67 +106,67 @@ export class PostResolver {
 
   @Mutation(() => Boolean)
   async updatePost(
-    @Arg("id") id: number,
+    @Arg("id") id: string,
     @Arg("input") input: PostInput
   ): Promise<boolean> {
     const res = await postRepository
       .update({ ...input, updatedAt: dateNow })
-      .eq("id", id);
+      .eq("id", parseInt(id));
 
     if (res.error) {
       throw res.error;
     }
 
-    await this.deleteCachePost(id);
+    await this.deleteCachePost(parseInt(id));
 
     return true;
   }
 
   @Mutation(() => Boolean)
-  async publishPost(@Arg("id") id: number): Promise<boolean> {
+  async publishPost(@Arg("id") id: string): Promise<boolean> {
     const res = await postRepository
       .update({
         isPublished: true,
         updatedAt: dateNow,
       })
-      .eq("id", id);
+      .eq("id", parseInt(id));
 
     if (res.error) {
       throw res.error;
     }
 
-    await this.deleteCachePost(id);
+    await this.deleteCachePost(parseInt(id));
 
     return true;
   }
 
   @Mutation(() => Boolean)
-  async unPublishPost(@Arg("id") id: number): Promise<boolean> {
+  async unPublishPost(@Arg("id") id: string): Promise<boolean> {
     const res = await postRepository
       .update({
         isPublished: false,
         updatedAt: dateNow,
       })
-      .eq("id", id);
+      .eq("id", parseInt(id));
 
     if (res.error) {
       throw res.error;
     }
 
-    await this.deleteCachePost(id);
+    await this.deleteCachePost(parseInt(id));
 
     return true;
   }
 
   @Mutation(() => Boolean)
-  async deletePost(@Arg("id") id: number): Promise<boolean> {
-    const res = await postRepository.delete().eq("id", id);
+  async deletePost(@Arg("id") id: string): Promise<boolean> {
+    const res = await postRepository.delete().eq("id", parseInt(id));
 
     if (res.error) {
       throw res.error;
     }
 
-    await this.deleteCachePost(id);
+    await this.deleteCachePost(parseInt(id));
 
     return true;
   }
@@ -188,6 +190,6 @@ export class PostResolver {
 
   @FieldResolver(() => String)
   slug(@Root() post: Post): string {
-    return post.title.replace(" ", "-");
+    return post.title.replace(" ", "-").toLowerCase();
   }
 }

@@ -75,7 +75,7 @@ export class PostResolver {
     const { data: postsBySlug } = await supabase
       .from("posts")
       .select("id")
-      .ilike("title", slug.replace(/-/gi, " "));
+      .ilike("title", `${slug.replace(/-/gi, " ")}%`);
 
     const id = postsBySlug![0].id;
 

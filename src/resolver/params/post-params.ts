@@ -1,4 +1,4 @@
-import { MaxLength } from "class-validator";
+import { IsBoolean, IsUrl, MaxLength } from "class-validator";
 import { ArgsType, Field, InputType } from "type-graphql";
 
 @InputType()
@@ -6,6 +6,10 @@ export class PostInput {
   @Field()
   @MaxLength(50)
   title: string;
+
+  @Field()
+  @MaxLength(255)
+  description: string;
 
   @Field()
   content: string;
@@ -16,12 +20,15 @@ export class PostInput {
   @Field({ nullable: true })
   emoji?: string;
 
+  @IsUrl()
   @Field({ nullable: true })
   coverImageUrl?: string;
 
+  @IsBoolean()
   @Field(() => Boolean, { nullable: true })
   isPublished: boolean;
 
+  @MaxLength(20)
   @Field({ nullable: true })
   createdPlace: string;
 }

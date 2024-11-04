@@ -8,6 +8,9 @@ export class Post {
   @Field()
   title: string;
 
+  @Field()
+  description: string;
+
   @Field({ nullable: true })
   emoji: string;
 

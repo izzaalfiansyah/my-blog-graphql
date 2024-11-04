@@ -14,30 +14,24 @@ import { dateNow } from "../utils/date-now";
 import { PRIVATE_KEY } from "./auth-resolver";
 import { redis } from "../utils/ioredis";
 
-export const postRepository = supabase.from("posts");
-
 const cache = {
   post: (id: any) => PRIVATE_KEY + "-POST:" + id,
 };
 
 @Resolver(() => Post)
 export class PostResolver {
+  repo() {
+    return supabase.from("posts");
+  }
+
   @Query(() => [Post])
   async posts(@Args() args: PostsArgs): Promise<Post[]> {
-    const query = postRepository.select("*").order("createdAt", {
+    const query = this.repo().select("*").order("createdAt", {
       ascending: false,
     });
 
     if (!!args.isPublished) {
       query.eq("isPublished", args.isPublished);
-    }
-
-    const limit = args.limit || 5;
-
-    if (!!args.page) {
-      query.range((args.page - 1) * limit, limit);
-    } else {
-      query.range(0, limit);
     }
 
     const { data: posts, error } = await query;
@@ -57,7 +51,7 @@ export class PostResolver {
       return JSON.parse(cachePost);
     }
 
-    const { data: posts } = await postRepository
+    const { data: posts } = await this.repo()
       .select("*")
       .eq("id", parseInt(id));
 
@@ -101,7 +95,7 @@ export class PostResolver {
 
   @Mutation(() => Boolean)
   async createPost(@Arg("input") input: PostInput): Promise<boolean> {
-    const res = await postRepository.insert(input);
+    const res = await this.repo().insert(input);
 
     if (res.error) {
       throw res.error;
@@ -115,7 +109,7 @@ export class PostResolver {
     @Arg("id") id: string,
     @Arg("input") input: PostInput
   ): Promise<boolean> {
-    const res = await postRepository
+    const res = await this.repo()
       .update({ ...input, updatedAt: dateNow })
       .eq("id", parseInt(id));
 
@@ -130,7 +124,7 @@ export class PostResolver {
 
   @Mutation(() => Boolean)
   async publishPost(@Arg("id") id: string): Promise<boolean> {
-    const res = await postRepository
+    const res = await this.repo()
       .update({
         isPublished: true,
         updatedAt: dateNow,
@@ -148,7 +142,7 @@ export class PostResolver {
 
   @Mutation(() => Boolean)
   async unPublishPost(@Arg("id") id: string): Promise<boolean> {
-    const res = await postRepository
+    const res = await this.repo()
       .update({
         isPublished: false,
         updatedAt: dateNow,
@@ -166,7 +160,7 @@ export class PostResolver {
 
   @Mutation(() => Boolean)
   async deletePost(@Arg("id") id: string): Promise<boolean> {
-    const res = await postRepository.delete().eq("id", parseInt(id));
+    const res = await this.repo().delete().eq("id", parseInt(id));
 
     if (res.error) {
       throw res.error;

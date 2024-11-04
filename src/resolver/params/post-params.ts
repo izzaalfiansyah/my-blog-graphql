@@ -42,5 +42,5 @@ export class PostsArgs {
   limit: number;
 
   @Field(() => Number, { nullable: true })
-  page: number;
+  from: number;
 }

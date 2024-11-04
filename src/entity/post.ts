@@ -26,6 +26,9 @@ export class Post {
   @Field(() => Boolean)
   isPublished: boolean;
 
+  @Field()
+  createdPlace: string;
+
   @Field(() => Date)
   createdAt: Date;
 

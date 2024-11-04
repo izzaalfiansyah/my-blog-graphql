@@ -21,6 +21,9 @@ export class PostInput {
 
   @Field(() => Boolean, { nullable: true })
   isPublished: boolean;
+
+  @Field({ nullable: true })
+  createdPlace: string;
 }
 
 @ArgsType()

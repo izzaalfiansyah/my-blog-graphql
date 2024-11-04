@@ -18,7 +18,6 @@ export const postRepository = supabase.from("posts");
 
 const cache = {
   post: (id: any) => PRIVATE_KEY + "-POST:" + id,
-  postBySlug: (slug: string) => PRIVATE_KEY + "-POSTBYSLUG:" + slug,
 };
 
 @Resolver(() => Post)
@@ -73,7 +72,14 @@ export class PostResolver {
 
   @Query(() => Post, { nullable: true })
   async postBySlug(@Arg("slug") slug: string): Promise<Post | null> {
-    const cachePost = await redis.get(cache.postBySlug(slug));
+    const { data: postsBySlug } = await supabase
+      .from("posts")
+      .select("id")
+      .ilike("title", slug.replace(/-/gi, " "));
+
+    const id = postsBySlug![0].id;
+
+    const cachePost = await redis.get(cache.post(id));
 
     if (cachePost) {
       return JSON.parse(cachePost);
@@ -82,12 +88,12 @@ export class PostResolver {
     const { data: posts } = await supabase
       .from("posts")
       .select("*")
-      .ilike("title", `${slug.replace("-", " ")}`);
+      .eq("id", parseInt(id));
 
     const post = posts![0] || null;
 
     if (!!post) {
-      await redis.set(cache.postBySlug(slug), JSON.stringify(post));
+      await redis.set(cache.post(id), JSON.stringify(post));
     }
 
     return post;
@@ -117,7 +123,7 @@ export class PostResolver {
       throw res.error;
     }
 
-    await this.deleteCachePost(parseInt(id));
+    await this.deleteCachePost({ id: id });
 
     return true;
   }
@@ -135,7 +141,7 @@ export class PostResolver {
       throw res.error;
     }
 
-    await this.deleteCachePost(parseInt(id));
+    await this.deleteCachePost({ id: id });
 
     return true;
   }
@@ -153,7 +159,7 @@ export class PostResolver {
       throw res.error;
     }
 
-    await this.deleteCachePost(parseInt(id));
+    await this.deleteCachePost({ id: id });
 
     return true;
   }
@@ -166,30 +172,22 @@ export class PostResolver {
       throw res.error;
     }
 
-    await this.deleteCachePost(parseInt(id));
+    await this.deleteCachePost({ id: id });
 
     return true;
   }
 
-  async deleteCachePost(id: number) {
-    const cachePost = await redis.get(cache.post(id));
-
-    if (!!cachePost) {
-      const slug = (JSON.parse(cachePost).title as string)
-        .replace(" ", "-")
-        .toLowerCase();
-      await redis.del(cache.post(id));
-
-      const cachePostBySlug = await redis.get(cache.postBySlug(slug));
-
-      if (!!cachePostBySlug) {
-        await redis.del(cache.postBySlug(slug));
+  async deleteCachePost({ id }: { id?: any }) {
+    if (id) {
+      const cachePost = await redis.get(cache.post(id));
+      if (!!cachePost) {
+        await redis.del(cache.post(id));
       }
     }
   }
 
   @FieldResolver(() => String)
   slug(@Root() post: Post): string {
-    return post.title.replace(" ", "-").toLowerCase();
+    return post.title.replace(/ /gi, "-").toLowerCase();
   }
 }

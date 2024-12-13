@@ -45,11 +45,11 @@ export class PostResolver {
 
   @Query(() => Post, { nullable: true })
   async post(@Arg("id") id: string): Promise<Post | null> {
-    const cachePost = await redis.get(cache.post(id));
+    // const cachePost = await redis.get(cache.post(id));
 
-    if (cachePost) {
-      return JSON.parse(cachePost);
-    }
+    // if (cachePost) {
+    //   return JSON.parse(cachePost);
+    // }
 
     const { data: posts } = await this.repo()
       .select("*")
@@ -57,9 +57,9 @@ export class PostResolver {
 
     const post = posts![0] || null;
 
-    if (!!post) {
-      await redis.set(cache.post(id), JSON.stringify(post));
-    }
+    // if (!!post) {
+    //   await redis.set(cache.post(id), JSON.stringify(post));
+    // }
 
     return post;
   }
@@ -73,11 +73,11 @@ export class PostResolver {
 
     const id = postsBySlug![0].id;
 
-    const cachePost = await redis.get(cache.post(id));
+    // const cachePost = await redis.get(cache.post(id));
 
-    if (cachePost) {
-      return JSON.parse(cachePost);
-    }
+    // if (cachePost) {
+    //   return JSON.parse(cachePost);
+    // }
 
     const { data: posts } = await supabase
       .from("posts")
@@ -86,9 +86,9 @@ export class PostResolver {
 
     const post = posts![0] || null;
 
-    if (!!post) {
-      await redis.set(cache.post(id), JSON.stringify(post));
-    }
+    // if (!!post) {
+    //   await redis.set(cache.post(id), JSON.stringify(post));
+    // }
 
     return post;
   }
@@ -172,12 +172,12 @@ export class PostResolver {
   }
 
   async deleteCachePost({ id }: { id?: any }) {
-    if (id) {
-      const cachePost = await redis.get(cache.post(id));
-      if (!!cachePost) {
-        await redis.del(cache.post(id));
-      }
-    }
+    // if (id) {
+    //   const cachePost = await redis.get(cache.post(id));
+    //   if (!!cachePost) {
+    //     await redis.del(cache.post(id));
+    //   }
+    // }
   }
 
   @FieldResolver(() => String)
